@@ -15,49 +15,30 @@
 'use strict';
 
 const assert = require('assert');
-const crypto = require('crypto');
 const testData = require('./dialogflow.json')
 const supertest = require('supertest');
 const functionsFramework = require('@google-cloud/functions-framework/testing');
 
-const {SLACK_SECRET, API_KEY} = process.env;
-const SLACK_TIMESTAMP = Date.now();
-
 require('../index');
 
-const generateSignature = query => {
-  const body = JSON.stringify({text: query});
-
-  const buf = Buffer.from(body);
-  const plaintext = `v0:${SLACK_TIMESTAMP}:${buf}`;
-
-  const hmac = crypto.createHmac('sha256', SLACK_SECRET);
-  hmac.update(plaintext);
-  const ciphertext = hmac.digest('hex');
-
-  return `v0=${ciphertext}`;
-};
-
 describe('functions_slack_format functions_slack_request functions_slack_search functions_verify_webhook', () => {
-  process.env.WEATHER_API_KEY = API_KEY;
-//   it('returns weather results', async () => {
-//     const query = 'kolach';
-//     const server = functionsFramework.getTestServer('weatherCheck');
-//     const response = await supertest(server)
-//       .post('/')
-//       .send(testData)
-//       .expect(200);
+  // process.env.WEATHER_API_KEY = WEATHER_API_KEY;
+  it('returns weather results', async () => {
+    const server = functionsFramework.getTestServer('weatherCheck');
+    const response = await supertest(server)
+      .post('/')
+      .send(testData)
+      .expect(200);
+      // console.log("response 1: ", response.body.fulfillmentMessages)
 
-//       console.log("response 1: ", response)
+    const results = response.body && response.body.fulfillmentMessages;
+    const result = results[0];
+    assert.ok(result);
+    assert.ok(response.body);
+    assert.ok(result.text.text[0].indexOf('Tokyo') > -1);
+  });
 
-//     const results = response.body && response.body.attachments;
-//     assert.ok(results);
 
-//     const result = results[0];
-//     assert.ok(response.body);
-//     // assert.ok(result.text);
-//     // assert.ok(result.text.includes('kolach'));
-//   });
 
 //   it('handles non-existent query', async () => {
 //     const query = 'g1bb3r1shhhhhhh';
