@@ -67,18 +67,18 @@ const getMocks = () => {
   };
 };
 
-// const stubConsole = function () {
-//   sinon.stub(console, 'error');
+const stubConsole = function () {
+  sinon.stub(console, 'error');
 //   sinon.stub(console, 'log');
-// };
+};
 
-// //Restore console
-// const restoreConsole = function () {
+//Restore console
+const restoreConsole = function () {
 //   console.log.restore();
-//   console.error.restore();
-// };
-// beforeEach(stubConsole);
-// afterEach(restoreConsole);
+  console.error.restore();
+};
+beforeEach(stubConsole);
+afterEach(restoreConsole);
 
 describe('functions_weathercheck', () => {
   it('Send fails if not a POST request', async () => {
@@ -107,6 +107,7 @@ describe('functions_weathercheck functions_verify_webhook', () => {
     mocks.req.method = method;
     mocks.req.body = query;
     mocks.req.body.queryResult.parameters.address.city = '';
+    mocks.req.body.queryResult.parameters.address['zip-code'] = '';
     sample.mocks.weathercheck.queryResult.parameters.yields({address: null});
 
     const weatherCheck = getFunction('weatherCheck');
@@ -116,7 +117,7 @@ describe('functions_weathercheck functions_verify_webhook', () => {
         {
           "text": {
             "text": [
-              "Please let me know where to look for the weather!"
+                "I would love to help, I just need to know where to look for the weather! :)"
             ]
           }
         }

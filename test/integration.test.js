@@ -23,7 +23,7 @@ require('../index');
 
 describe('functions_slack_format functions_slack_request functions_slack_search functions_verify_webhook', () => {
   // process.env.WEATHER_API_KEY = WEATHER_API_KEY;
-  it('returns weather results', async () => {
+  it('it handles city weather results', async () => {
     const server = functionsFramework.getTestServer('weatherCheck');
     const response = await supertest(server)
       .post('/')
@@ -38,29 +38,24 @@ describe('functions_slack_format functions_slack_request functions_slack_search 
     assert.ok(result.text.text[0].indexOf('Tokyo') > -1);
   });
 
+  it('it handles zip code weather results', async () => {
+    const server = functionsFramework.getTestServer('weatherCheck');
+    let tempData = testData
+    tempData.queryResult.parameters.address.city = '';
+    tempData.queryResult.parameters.address['zip-code'] = "94606"
+    const response = await supertest(server)
+      .post('/')
+      .send(tempData)
+      .expect(200);
 
-
-//   it('handles non-existent query', async () => {
-//     const query = 'g1bb3r1shhhhhhh';
-
-//     const server = functionsFramework.getTestServer('weatherCheck');
-//     const response = await supertest(server)
-//       .post('/')
-//       .send({text: query})
-//       .expect(200);
-
-//     const result = response.body;
-//     assert.ok(result);
-
-//     // const result = results[0];
-//     // assert.ok(result);
-//     // assert.ok(result.text);
-//     // assert.ok(result.text.includes('No results'));
-//   });
+    const results = response.body && response.body.fulfillmentMessages;
+    const result = results[0];
+    assert.ok(result);
+    assert.ok(response.body);
+    assert.ok(result.text.text[0].indexOf('Oakland') > -1);
+  });
 
   it('handles empty query', async () => {
-    const query = '';
-
     const server = functionsFramework.getTestServer('weatherCheck');
     await supertest(server)
       .post('/')

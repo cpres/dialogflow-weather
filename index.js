@@ -3,6 +3,10 @@ const functions = require('@google-cloud/functions-framework');
 const axios = require('axios');
 
 const getLocation = async(query) => {
+  // Zip codes are better than cities as you will get more localized results, so we start there
+  if (query.parameters.address['zip-code'] !== '') {
+    return {zip: query.parameters.address['zip-code']}
+  }
   const city = (query.parameters.address.city) ? query.parameters.address.city : false
   if (!city) {
     return false
@@ -19,26 +23,38 @@ const getLocation = async(query) => {
     console.error(err)
   }
 }
+
+
+/**
+ * 
+ * @param {obj} queryResult - dialogflow's queryResult
+ * @param {obj} locationData - either an openweatherapi response or else just a zip
+ * @returns 
+ */
 const getWeather = async(queryResult, locationData) => {
   // @TODO - use queryResult date-time to get weather for a specific day.
   try {
-    const city = queryResult.parameters.address.city
-    const {data} = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${locationData.lat}&lon=${locationData.lon}&units=imperial&appid=${process.env.WEATHER_API_KEY}`)
-    data.city = city // keep necessary data together
+    const weatherParams = (locationData.zip) ? `zip=${locationData.zip}` : `lat=${locationData.lat}&lon=${locationData.lon}`
+    const {data} = await axios.get(`https://api.openweathermap.org/data/2.5/weather?${weatherParams}&units=imperial&appid=${process.env.WEATHER_API_KEY}`)
+    data.city = (queryResult.parameters.address.city) ? queryResult.parameters.address.city : data.name
     return data
   } catch (err) {
     console.error(err)
     // @TODO - handle error based on error response
   }
 }
+
+
 /**
- * 
- * @param {obj} weatherObj - openweatherapi response
+ * formatWeatherResponse
+ * This is what we'll respond as human friendly text for the chat bot.
+ * @param {obj} weatherObj - openweatherapi response with city added.
  */
 const formatWeatherResponse = weatherObj => {
-  // console.log("Weather returned: ", weatherObj.main, weatherObj.city, weatherObj.weather)
-  return `In ${weatherObj.city} today, there will be ${weatherObj.weather[0].main} with a high of ${weatherObj.main.temp_max}&deg; and a low of ${weatherObj.main.temp_min}&deg;`
+  return `In ${weatherObj.city} today, there will be ${weatherObj.weather[0].description} with a high of ${weatherObj.main.temp_max}° and a low of ${weatherObj.main.temp_min}°`
 }
+
+
 /**
  * formatDialogFlowResponse
  * Initially handling a single response message back to Dialogflow
@@ -55,6 +71,7 @@ const formatDialogFlowResponse = (body) => {
     }
   ]}
 }
+
 functions.http('weatherCheck', async (req, res) => {
   try {
     if (req.method !== 'POST') {
@@ -70,7 +87,7 @@ functions.http('weatherCheck', async (req, res) => {
     }
     const location = await getLocation(req.body.queryResult);
     if (!location) {
-      const noLocationResponse = formatDialogFlowResponse("Please let me know where to look for the weather!")
+      const noLocationResponse = formatDialogFlowResponse("I would love to help, I just need to know where to look for the weather! :)")
       res.json(noLocationResponse)
       return Promise.resolve();
     }
