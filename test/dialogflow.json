@@ -1,0 +1,87 @@
+{
+    "responseId": "8a959e3b-d2cb-42c5-9c1e-2703842485da-36f35620",
+    "queryResult": {
+      "queryText": "What's the forecast tomorrow for Tokyo?",
+      "action": "weather",
+      "parameters": {
+        "unit": "",
+        "date-time": "2022-06-21T12:00:00-07:00",
+        "address": {
+          "street-address": "",
+          "admin-area": "",
+          "subadmin-area": "",
+          "city": "Tokyo",
+          "shortcut": "",
+          "country": "",
+          "business-name": "",
+          "zip-code": "",
+          "island": ""
+        }
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              ""
+            ]
+          }
+        }
+      ],
+      "outputContexts": [
+        {
+          "name": "projects/weather-et9p/agent/sessions/45c4014a-6f77-93fe-c538-ee500d4d9570/contexts/weather",
+          "lifespanCount": 2,
+          "parameters": {
+            "unit": "",
+            "address": {
+              "city": "Tokyo",
+              "subadmin-area": "",
+              "business-name": "",
+              "street-address": "",
+              "island": "",
+              "admin-area": "",
+              "zip-code": "",
+              "shortcut": "",
+              "country": ""
+            },
+            "date-time": "2022-06-21T12:00:00-07:00",
+            "date-time.original": "tomorrow",
+            "address.original": "Tokyo",
+            "unit.original": ""
+          }
+        },
+        {
+          "name": "projects/weather-et9p/agent/sessions/45c4014a-6f77-93fe-c538-ee500d4d9570/contexts/weather-followup",
+          "lifespanCount": 2,
+          "parameters": {
+            "date-time.original": "tomorrow",
+            "unit.original": "",
+            "date-time": "2022-06-21T12:00:00-07:00",
+            "unit": "",
+            "address.original": "Tokyo",
+            "address": {
+              "island": "",
+              "city": "Tokyo",
+              "street-address": "",
+              "business-name": "",
+              "country": "",
+              "admin-area": "",
+              "subadmin-area": "",
+              "zip-code": "",
+              "shortcut": ""
+            }
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/weather-et9p/agent/intents/f1b75ecb-a35f-4a26-88fb-5a8049b92b02",
+        "displayName": "weather"
+      },
+      "intentDetectionConfidence": 0.6181029,
+      "languageCode": "en",
+      "sentimentAnalysisResult": {
+        "queryTextSentiment": {}
+      }
+    }
+  }

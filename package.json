@@ -1,0 +1,21 @@
+{
+  "name": "slack-weather-bot",
+  "version": "0.1.1",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
+    "@slack/events-api": "^3.0.1",
+    "axios": "^0.27.2",
+    "basic-auth": "^2.0.1",
+    "tsscmp": "^1.0.6"
+  },
+  "devDependencies": {
+    "mocha": "^9.0.0",
+    "proxyquire": "^2.1.0",
+    "sinon": "^14.0.0",
+    "supertest": "^6.2.3"
+  },
+  "scripts": {
+    "test": "mocha test/*.test.js --timeout=20000 --exit",
+    "deploy": "gcloud functions deploy weatherCheck --trigger-http"
+  }
+}
