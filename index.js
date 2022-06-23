@@ -2,17 +2,23 @@ const functions = require('@google-cloud/functions-framework');
 // const {verifyRequestSignature} = require('@slack/events-api');
 const axios = require('axios');
 
-const getLocation = async(query) => {
+/**
+ * 
+ * @param {obj} queryResult - dialogflow's queryResult 
+ * @returns location object or false
+ */
+const getLocation = async(queryResult) => {
   // Zip codes are better than cities as you will get more localized results, so we start there
-  if (query.parameters.address['zip-code'] !== '') {
-    return {zip: query.parameters.address['zip-code']}
+  if (queryResult.parameters.address['zip-code'] !== '') {
+    return {zip: queryResult.parameters.address['zip-code']}
   }
-  const city = (query.parameters.address.city) ? query.parameters.address.city : false
+  const city = (queryResult.parameters.address.city) ? queryResult.parameters.address.city : false
   if (!city) {
     return false
   }
 
   try {
+    // @TODO - return a larger array of city options and give results for each one in response blocks?
     const {data} = await axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${process.env.WEATHER_API_KEY}`)
     if (data[0].lat && data[0].lon) {
       return data[0]
@@ -26,6 +32,7 @@ const getLocation = async(query) => {
 
 
 /**
+ * getWeather - Get Weather from OpenWeather
  * 
  * @param {obj} queryResult - dialogflow's queryResult
  * @param {obj} locationData - either an openweatherapi response or else just a zip
@@ -51,6 +58,7 @@ const getWeather = async(queryResult, locationData) => {
  * @param {obj} weatherObj - openweatherapi response with city added.
  */
 const formatWeatherResponse = weatherObj => {
+  // @TODO - this sentence works with some descriptions and not others, respond with multiple types of sentences depending on the weather.
   return `In ${weatherObj.city} today, there will be ${weatherObj.weather[0].description} with a high of ${weatherObj.main.temp_max}° and a low of ${weatherObj.main.temp_min}°`
 }
 
@@ -61,6 +69,7 @@ const formatWeatherResponse = weatherObj => {
  * @param {@str} body - the message to be sent
  */
 const formatDialogFlowResponse = (body) => {
+  // @TODO - handle more complex response logic with images and sections
   return {"fulfillmentMessages": [
     {
       "text": {
@@ -72,6 +81,9 @@ const formatDialogFlowResponse = (body) => {
   ]}
 }
 
+/**
+ * CLOUD FUNCTION HTTP HANDLER 
+ */
 functions.http('weatherCheck', async (req, res) => {
   try {
     if (req.method !== 'POST') {
