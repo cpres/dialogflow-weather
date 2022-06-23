@@ -32,3 +32,5 @@ Handle images of the weather in the response. We can parse an image url out of o
 Handle the input of city, state and country. Openweather requires state codes and country codes in a particular ISO format, this is not the format that Dialogflow sends city and state information.
 
 Dialogflow is sending date-time to this app, Using that and we can parse through the time periods that come with openweather, which contains dates in 3 hour windows.
+
+Dialogflow is setup to handle things like weather you should wear a swimsuit, or wear gloves. Adding temperature based logic for clothing items would be a very fun addition to this software's capabilities.
