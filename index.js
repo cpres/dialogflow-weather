@@ -3,7 +3,45 @@ const functions = require('@google-cloud/functions-framework');
 const axios = require('axios');
 
 /**
- * 
+ * CLOUD FUNCTION HTTP HANDLER 
+ */
+ functions.http('weatherCheck', async (req, res) => {
+  try {
+    if (req.method !== 'POST') {
+      const error = new Error('Only POST requests are accepted');
+      error.code = 405;
+      throw error;
+    }
+
+    if (!req.body.queryResult) {
+      const error = new Error('No queryResult found in body.');
+      error.code = 400;
+      throw error;
+    }
+    const location = await getLocation(req.body.queryResult);
+    if (!location) {
+      const noLocationResponse = formatDialogFlowResponse("I would love to help, I just need to know where to look for the weather! :)")
+      res.json(noLocationResponse)
+      return Promise.resolve();
+    }
+    const weatherObj = await getWeather(req.body.queryResult, location);
+
+    const weatherResp = formatWeatherResponse(weatherObj)
+
+    res.json(formatDialogFlowResponse(weatherResp));
+
+    return Promise.resolve();
+
+  } catch (err) {
+    console.error(err);
+    res.status(err.code || 500).send(err);
+    return Promise.reject(err);
+  }
+});
+
+
+/**
+ * getLocation
  * @param {obj} queryResult - dialogflow's queryResult 
  * @returns location object or false
  */
@@ -33,7 +71,6 @@ const getLocation = async(queryResult) => {
 
 /**
  * getWeather - Get Weather from OpenWeather
- * 
  * @param {obj} queryResult - dialogflow's queryResult
  * @param {obj} locationData - either an openweatherapi response or else just a zip
  * @returns 
@@ -80,40 +117,3 @@ const formatDialogFlowResponse = (body) => {
     }
   ]}
 }
-
-/**
- * CLOUD FUNCTION HTTP HANDLER 
- */
-functions.http('weatherCheck', async (req, res) => {
-  try {
-    if (req.method !== 'POST') {
-      const error = new Error('Only POST requests are accepted');
-      error.code = 405;
-      throw error;
-    }
-
-    if (!req.body.queryResult) {
-      const error = new Error('No queryResult found in body.');
-      error.code = 400;
-      throw error;
-    }
-    const location = await getLocation(req.body.queryResult);
-    if (!location) {
-      const noLocationResponse = formatDialogFlowResponse("I would love to help, I just need to know where to look for the weather! :)")
-      res.json(noLocationResponse)
-      return Promise.resolve();
-    }
-    const weatherObj = await getWeather(req.body.queryResult, location);
-
-    const weatherResp = formatWeatherResponse(weatherObj)
-
-    res.json(formatDialogFlowResponse(weatherResp));
-
-    return Promise.resolve();
-
-  } catch (err) {
-    console.error(err);
-    res.status(err.code || 500).send(err);
-    return Promise.reject(err);
-  }
-});
