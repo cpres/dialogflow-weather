@@ -1,5 +1,4 @@
 const functions = require('@google-cloud/functions-framework');
-// const {verifyRequestSignature} = require('@slack/events-api');
 const axios = require('axios');
 
 /**

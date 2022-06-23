@@ -25,7 +25,7 @@ In order to run the tests you will need to be running Node 16, and to have an Op
 # Desires for the app:
 Add authentication! For rapid-prototyping and considerations with Dialogflow, the v1 is not including authentication, but this is an important element of any web service.
 
-I built two-step Openweather call, where we can start with getting multiple locations based off a city. The future enhancement is to ask the user to pick from an option, or otherwise show multiple location responses, Paris France, as well as Paris Texas, etc... 
+I built a two-step Openweather call, where we can start with getting multiple locations based off a city. The future enhancement is to make an interactive response where the user can pick from an option, or otherwise show multiple location responses, Paris France, as well as Paris Texas, etc... 
 
 Handle images of the weather in the response. We can parse an image url out of open weather responses like this: http://openweathermap.org/img/wn/10d@2x.png
 
