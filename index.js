@@ -19,7 +19,7 @@ const axios = require('axios');
     }
     const location = await getLocation(req.body.queryResult);
     if (!location) {
-      const noLocationResponse = formatDialogFlowResponse("I would love to help, I just need to know where to look for the weather! :)")
+      const noLocationResponse = formatDialogFlowResponse(["I would love to help, I just need to know where to look for the weather! :)"])
       res.json(noLocationResponse)
       return Promise.resolve();
     }
@@ -95,23 +95,24 @@ const getWeather = async(queryResult, locationData) => {
  */
 const formatWeatherResponse = weatherObj => {
   // @TODO - this sentence works with some descriptions and not others, respond with multiple types of sentences depending on the weather.
-  return `In ${weatherObj.city} today, there will be ${weatherObj.weather[0].description} with a high of ${weatherObj.main.temp_max}° and a low of ${weatherObj.main.temp_min}°`
+  let respArr = [];
+  respArr.push(`In ${weatherObj.city} today, there will be ${weatherObj.weather[0].description} with a high of ${weatherObj.main.temp_max}° and a low of ${weatherObj.main.temp_min}°`)
+  respArr.push(`Looking into ${weatherObj.city}, today appears to have ${weatherObj.weather[0].description} and has a high of ${weatherObj.main.temp_max}° and a low of ${weatherObj.main.temp_min}°`)
+  return respArr
 }
 
 
 /**
  * formatDialogFlowResponse
  * Initially handling a single response message back to Dialogflow
- * @param {@str} body - the message to be sent
+ * @param {@arr} textArr - the messages to be sent ["msg one","msg two"]
  */
-const formatDialogFlowResponse = (body) => {
+const formatDialogFlowResponse = (textArr) => {
   // @TODO - handle more complex response logic with images and sections
   return {"fulfillmentMessages": [
     {
       "text": {
-        "text": [
-          body
-        ]
+        "text": textArr
       }
     }
   ]}
